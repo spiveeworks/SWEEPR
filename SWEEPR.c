@@ -91,7 +91,9 @@ int main() {
     srand(time(NULL));
     for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++) {
-            if (!((i < 3) && (j < 3)) && random_bool(flag_num, cleared_num)) {
+            if (i < 3 && j < 3) {
+                // we clear these separately
+            } else if (random_bool(flag_num, cleared_num)) {
                 flag_num--;
 
                 mines[tile(i, j)] = true;
