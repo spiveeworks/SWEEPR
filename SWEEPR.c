@@ -125,7 +125,15 @@ int main() {
                     }
                     if(flag_strat) {
                         // do flag strat
-                        // made_progress = true;
+                        for (int ip = -1; ip <= 1; ip++)
+                            for (int jp = -1; jp <= 1; jp++) {
+                                int tp = tile(focus_i+ip, focus_j+jp);
+                                if (!cleared[tp] && !flags[tp]) {
+                                    flag(focus_i+ip, focus_j+jp);
+                                    flag_num++;
+                                }
+                            }
+                        made_progress = true;
                         continue;
                     }
                     if (clear_strat) {
