@@ -1,3 +1,7 @@
+#include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
+
 typedef unsigned char byte;
 
 int _tile(int width, int height, int x, int y) {
@@ -14,8 +18,8 @@ void _mark(
     int height,
     bool* marks,
     byte* adjacent_marks,
-    int x,
-    int y,
+    int i,
+    int j
 ) {
     marks[tile(i, j)] = true;
     for (int ip = -1; i < 2; i++)
@@ -25,6 +29,26 @@ void _mark(
 
 #define flag(i, j) _mark(width, height, mines, adjacent_mines, i, j)
 #define clear(i, j) _mark(width, height, cleared, adjecent_cleared, i, j)
+
+int rand_lim(int limit) {
+/* return a random number between 0 and limit inclusive.
+ * https://stackoverflow.com/questions/2999075/generate-a-random-number-within-range
+ */
+
+    int divisor = RAND_MAX/(limit+1);
+    int retval;
+
+    do {
+        retval = rand() / divisor;
+    } while (retval > limit);
+
+    return retval;
+}
+
+bool random_bool(int true_freq, int false_freq) {
+    int r = rand_lim(true_freq + false_freq);
+    return r < true_freq;
+}
 
 int main() {
     int width = 10,
@@ -54,14 +78,16 @@ int main() {
         mines[t] = false;
         adjacent_mines[t] = 0;
 
-        clear[t] = false;
+        cleared[t] = false;
         flags[t] = false;
 
-        adjacent_clear[t] = 0;
+        adjacent_cleared[t] = 0;
         adjacent_flags[t] = 0;
     }
 
-    clear_num -= 9;
+    cleared_num -= 9;
+
+    srand(time(NULL));
     for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++) {
             if (!((i < 3) && (j < 3)) && random_bool(flag_num, cleared_num)) {
@@ -72,11 +98,11 @@ int main() {
                     for (int jp = -1; j < 2; j++)
                         adjacent_mines[tile(ip, jp)]++;
             } else {
-                clear_num--;
+                cleared_num--;
             }
         }
 
-    clear[tile(1, 1)] = true;
+    cleared[tile(1, 1)] = true;
 
     while (flag_num < mine_num) {
         for (int focus_i = 0; focus_i < width; focus_i++)
