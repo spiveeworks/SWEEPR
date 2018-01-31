@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -104,14 +105,83 @@ int main() {
 
     cleared[tile(1, 1)] = true;
 
-    while (flag_num < mine_num) {
+    bool made_progress = true;
+    while (made_progress && flag_num < mine_num) {
+        made_progress = false;
         for (int focus_i = 0; focus_i < width; focus_i++)
             for (int focus_j = 0; focus_j < height; focus_j++) {
-                if (cleared[tile(focus_i, focus_j)]) {
-
+                int t = tile(focus_i, focus_j);
+                if (cleared[t]) {
+                    bool clear_strat = adjacent_flags[t] == adjacent_mines[t];
+                    bool flag_strat =
+                        adjacent_cleared[t] + adjacent_mines[t] == 9;
+                    if (flag_strat && clear_strat) {
+                        // if both strategies are possible,
+                        // then they have already been done.
+                        continue;
+                    }
+                    if(flag_strat) {
+                        // do flag strat
+                        // made_progress = true;
+                        continue;
+                    }
+                    if (clear_strat) {
+                        // do clear strat
+                        // made_progress = true;
+                        continue;
+                    }
+                    // try advanced strats?
+                    // or should i do more advanced checks for the above two
                 }
             }
     }
+
+    printf("Flags found: %d/%d\n", flag_num, mine_num);
+
+    for (int j = 0; j < height; j++) {
+        for (int i = 0; i < width; i++) {
+            int t = tile(i, j);
+
+            int case_num = 0;
+            if (cleared[t]) {
+                case_num += 1;
+            }
+            if (flags[t]) {
+                case_num += 2;
+            }
+            if (mines[t]) {
+                case_num += 4;
+            }
+            switch (case_num) {
+                case 0:  // untouched, empty
+                    putchar('+');
+                    break;
+                case 1:  // cleared, empty
+                    if (adjacent_cleared[t] == 0) {
+                        putchar(' ');
+                    } else {
+                        printf("%d", adjacent_cleared[t]);
+                    }
+                    break;
+                case 4:  // untouched, mine
+                    putchar('*');
+                    break;
+                case 5:  // cleared, mine
+                    putchar('X');
+                    break;
+                case 6:  // flagged, mine
+                    putchar('!');
+                    break;
+                case 2:  // flagged, empty
+                case 3:  // cleared, flagged, empty
+                case 7:  // cleared, flagged, mine
+                    putchar('X');
+                    break;
+            }
+        }
+        putchar('\n');
+    }
+
 }
 
 
