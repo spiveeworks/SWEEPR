@@ -56,9 +56,9 @@ bool random_bool(int true_freq, int false_freq) {
 }
 
 int main() {
-    int width = 10,
-        height = 10,
-        mine_num = 10,
+    int width = 50,
+        height = 50,
+        mine_num = 500,
 
         flag_num = mine_num,
         cleared_num = (width * height) - mine_num;
