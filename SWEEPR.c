@@ -23,9 +23,9 @@ void _mark(
     int j
 ) {
     marks[tile(i, j)] = true;
-    for (int ip = -1; i < 2; i++)
-        for (int jp = -1; j < 2; j++)
-            adjacent_marks[tile(ip, jp)]++;
+    for (int ip = -1; ip <= 1; ip++)
+        for (int jp = -1; jp <= 1; jp++)
+            adjacent_marks[tile(i+ip, j+jp)]++;
 }
 
 #define flag(i, j) _mark(width, height, mines, adjacent_mines, i, j)
