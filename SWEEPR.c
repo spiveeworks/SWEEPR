@@ -6,6 +6,9 @@
 typedef unsigned char byte;
 
 int _tile(int width, int height, int x, int y) {
+    // because C handles (%) stupidly
+    x += width;
+    y += height;
     x %= width;
     y %= height;
 
@@ -28,8 +31,9 @@ void _mark(
             adjacent_marks[tile(i+ip, j+jp)]++;
 }
 
-#define flag(i, j) _mark(width, height, mines, adjacent_mines, i, j)
-#define clear(i, j) _mark(width, height, cleared, adjecent_cleared, i, j)
+#define place_mine(i, j) _mark(width, height, mines, adjacent_mines, i, j)
+#define flag(i, j) _mark(width, height, flags, adjacent_flags, i, j)
+#define clear(i, j) _mark(width, height, cleared, adjacent_cleared, i, j)
 
 int rand_lim(int limit) {
 /* return a random number between 0 and limit inclusive.
@@ -96,16 +100,13 @@ int main() {
             } else if (random_bool(flag_num, cleared_num)) {
                 flag_num--;
 
-                mines[tile(i, j)] = true;
-                for (int ip = -1; i < 2; i++)
-                    for (int jp = -1; j < 2; j++)
-                        adjacent_mines[tile(ip, jp)]++;
+                place_mine(i, j);
             } else {
                 cleared_num--;
             }
         }
 
-    cleared[tile(1, 1)] = true;
+    clear(1, 1);
 
     bool made_progress = true;
     while (made_progress && flag_num < mine_num) {
@@ -129,7 +130,15 @@ int main() {
                     }
                     if (clear_strat) {
                         // do clear strat
-                        // made_progress = true;
+                        for (int ip = -1; ip <= 1; ip++)
+                            for (int jp = -1; jp <= 1; jp++) {
+                                int tp = tile(focus_i+ip, focus_j+jp);
+                                if (!cleared[tp] && !flags[tp]) {
+                                    clear(focus_i+ip, focus_j+jp);
+                                    cleared_num++;
+                                }
+                            }
+                        made_progress = true;
                         continue;
                     }
                     // try advanced strats?
@@ -159,10 +168,10 @@ int main() {
                     putchar('+');
                     break;
                 case 1:  // cleared, empty
-                    if (adjacent_cleared[t] == 0) {
+                    if (adjacent_mines[t] == 0) {
                         putchar(' ');
                     } else {
-                        printf("%d", adjacent_cleared[t]);
+                        printf("%d", adjacent_mines[t]);
                     }
                     break;
                 case 4:  // untouched, mine
